@@ -10,27 +10,24 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
+  PageController _pageController = PageController();
+
   int _widgetIndex = 0;
   final List<Widget> _widgets = [
     PlaceholderWidget(Colors.purple),
     PlaceholderWidget(Colors.deepOrange),
   ];
 
-  TabController _tabController;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _tabController = TabController(length: _widgets.length, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    _tabController.dispose();
-    super.dispose();
-  }
+  final List<BottomNavigationBarItem> _navigationBarItems = [
+    BottomNavigationBarItem(
+      icon: Icon(Icons.access_alarm),
+      title: Text("Pomodoro")
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.timer),
+      title: Text("Interval")
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -38,31 +35,28 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       appBar: AppBar(
         title: Text('Timie'),
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            this._widgetIndex = index;
+          });
+        },
         children: _widgets,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        onTap: _onTabTapped, // new
-        currentIndex: _widgetIndex, // new
-        items: [
-          new BottomNavigationBarItem(
-            icon: Icon(Icons.access_alarm),
-            title: Text('Pomodoro'),
-          ),
-          new BottomNavigationBarItem(
-            icon: Icon(Icons.timer),
-            title: Text('HIIT'),
-          ),
-        ],
+        currentIndex: _widgetIndex,
+        items: _navigationBarItems,
+        onTap: _bottomNavigationBarOnTapped,
       ),
     );
   }
 
-  void _onTabTapped(int index) {
-    setState(() {
-      _widgetIndex = index;
-      _tabController.animateTo(_widgetIndex);
-    });
+  void _bottomNavigationBarOnTapped(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 }
