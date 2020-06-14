@@ -34,6 +34,9 @@ class _IntervalTimerState extends State<IntervalTimer> with SingleTickerProvider
     _animationController.addListener(() {
       if (_animationController.isCompleted) {
         _refreshAnimatioNController();
+        if (_interval.currentTaskIndex() != 0) {
+          _animationController.forward();
+        }
       }
       _updateTimerLabel();
       setState(() {});
@@ -68,6 +71,11 @@ class _IntervalTimerState extends State<IntervalTimer> with SingleTickerProvider
     int nextTaskIndex = (_interval.currentTaskIndex() + 1) % _interval.count();
     Task nextTask = _interval.task(nextTaskIndex);
     Color nextTaskColor = nextTask.type.backgroundColor;
+
+    int lastTaskIndex = _interval.count() - 1;
+    Task lastTask = _interval.task(lastTaskIndex);
+    Color lastTaskColor = lastTask.type.backgroundColor;
+    Color thirdRingColor = _interval.currentTaskIndex() == _interval.count() - 3 ? lastTaskColor : Colors.black12;
 
     List<Widget> widgets = [
       Container(
@@ -106,7 +114,7 @@ class _IntervalTimerState extends State<IntervalTimer> with SingleTickerProvider
           child: CircularProgressIndicator(
             strokeWidth: 20.0,
             value: 1.0,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.black12),
+            valueColor: AlwaysStoppedAnimation<Color>(thirdRingColor),
           ),
           height: 200,
           width: 200,
@@ -179,6 +187,9 @@ class _IntervalTimerState extends State<IntervalTimer> with SingleTickerProvider
                     color: Colors.blue,
                     onPressed: () {
                       _refreshAnimatioNController();
+                      if (_interval.currentTaskIndex() != 0) {
+                        _animationController.forward();
+                      }
                       setState(() {});
                     },
                   ),
@@ -192,6 +203,7 @@ class _IntervalTimerState extends State<IntervalTimer> with SingleTickerProvider
         ],
         mainAxisAlignment: MainAxisAlignment.center,
       ),
+      color: Colors.white70,
     );
   }
 }
