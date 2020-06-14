@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'placeholder.dart';
+
+import 'interval_timer.dart';
+import 'pomodoro.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -14,8 +16,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   int _widgetIndex = 0;
   final List<Widget> _widgets = [
-    PlaceholderWidget(Colors.purple),
-    PlaceholderWidget(Colors.deepOrange),
+    Pomodoro(),
+    IntervalTimer(),
   ];
 
   final List<BottomNavigationBarItem> _navigationBarItems = [
