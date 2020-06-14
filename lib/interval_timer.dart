@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 
-class PlaceholderWidget extends StatelessWidget {
-  final Color color;
-
-  PlaceholderWidget(this.color);
+class IntervalTimer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: color,
+      child: Text("88:88"),
     );
   }
 }
