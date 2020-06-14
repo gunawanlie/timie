@@ -96,27 +96,25 @@ class _PomodoroState extends State<Pomodoro> {
       color: Colors.white70,
       child: Column(
         children: <Widget>[
-          Container(
-            child: IntrinsicWidth(
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    "23:59",
-                    style: TextStyle(
-                      fontFamily: 'Teko',
-                      fontSize: 150,
-                    ),
+          IntrinsicWidth(
+            child: Column(
+              children: <Widget>[
+                Text(
+                  "23:59",
+                  style: TextStyle(
+                    fontFamily: 'Teko',
+                    fontSize: 150,
                   ),
-                  Row(
-                    children: _progressIndicators,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                  ),
-                  Row(
-                    children: _buttons,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                  ),
-                ],
-              ),
+                ),
+                Row(
+                  children: _progressIndicators,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                Row(
+                  children: _buttons,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                ),
+              ],
             ),
           ),
         ],
