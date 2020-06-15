@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 enum Config {
 
   intervalExercise,
@@ -5,7 +7,6 @@ enum Config {
   intervalSets,
   intervalRecovery,
   intervalCycles,
-
   pomodoroFocus,
   pomodoroShortBreak,
   pomodoroLongBreak,
@@ -14,62 +15,28 @@ enum Config {
 extension ConfigExtensions on Config {
 
   int get defaultValue {
-    switch (this) {
-      case Config.intervalExercise:
-        return 20;
-        break;
-      case Config.intervalRest:
-        return 10;
-        break;
-      case Config.intervalSets:
-        return 8;
-        break;
-      case Config.intervalRecovery:
-        return 60;
-        break;
-      case Config.intervalCycles:
-        return 3;
-        break;
-      case Config.pomodoroFocus:
-        return 25;
-        break;
-      case Config.pomodoroShortBreak:
-        return 5;
-        break;
-      case Config.pomodoroLongBreak:
-        return 15;
-        break;
-    }
-    return null;
+    SplayTreeMap values = SplayTreeMap<int, int>();
+    values[Config.intervalExercise.index] = 20;
+    values[Config.intervalRest.index] = 10;
+    values[Config.intervalSets.index] = 8;
+    values[Config.intervalRecovery.index] = 60;
+    values[Config.intervalCycles.index] = 3;
+    values[Config.pomodoroFocus.index] = 25;
+    values[Config.pomodoroShortBreak.index] = 5;
+    values[Config.pomodoroLongBreak.index] = 15;
+    return values[this.index];
   }
 
   String get cacheKey {
-    switch (this) {
-      case Config.intervalExercise:
-        return "interval_exercise";
-        break;
-      case Config.intervalRest:
-        return "interval_rest";
-        break;
-      case Config.intervalSets:
-        return "interval_sets";
-        break;
-      case Config.intervalRecovery:
-        return "interval_recovery";
-        break;
-      case Config.intervalCycles:
-        return "interval_cycles";
-        break;
-      case Config.pomodoroFocus:
-        return "pomodoro_focus";
-        break;
-      case Config.pomodoroShortBreak:
-        return "pomodoro_short_break";
-        break;
-      case Config.pomodoroLongBreak:
-        return "pomodoro_long_break";
-        break;
-    }
-    return null;
+    SplayTreeMap keys = SplayTreeMap<int, String>();
+    keys[Config.intervalExercise.index] = "interval_exercise";
+    keys[Config.intervalRest.index] = "interval_rest";
+    keys[Config.intervalSets.index] = "interval_sets";
+    keys[Config.intervalRecovery.index] = "interval_recovery";
+    keys[Config.intervalCycles.index] = "interval_cycles";
+    keys[Config.pomodoroFocus.index] = "pomodoro_focus";
+    keys[Config.pomodoroShortBreak.index] = "pomodoro_short_break";
+    keys[Config.pomodoroLongBreak.index] = "pomodoro_long_break";
+    return keys[this.index];
   }
 }
