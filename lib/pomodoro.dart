@@ -188,11 +188,13 @@ class _PomodoroState extends State<Pomodoro> with SingleTickerProviderStateMixin
     for (int i=0; i<pomodoro.count(); i++) {
       double value = (i < pomodoro.currentTaskIndex() ? 1.0 : (i > pomodoro.currentTaskIndex() ? 0.0 : _animationController.value));
 
-      _indicators.add(Expanded(
+      _indicators.add(SizedBox(
         child: Container(
           child: _progressIndicator(pomodoro.task(i), value),
           padding: EdgeInsets.symmetric(horizontal: 1.0),
         ),
+        height: 6,
+        width: 30,
       ));
     }
 
