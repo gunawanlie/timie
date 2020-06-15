@@ -1,15 +1,15 @@
 import 'task.dart';
 import 'task_type.dart';
 
-class Tasks {
+class TaskList {
 
   int _index;
   List<Task> _list = [];
 
-  Tasks(int taskDuration, int shortRestDuration, int longRestDuration, int sets, int cycle) {
+  TaskList(int taskDuration, int shortRestDuration, int longRestDuration, int sets, int cycles) {
     _index = 0;
     
-    for (int c=0; c<cycle; c++) {
+    for (int c=0; c<cycles; c++) {
       for (int s=0; s<sets; s++) {
         _list.add(Task(taskDuration, TaskType.task));
         if (!_isLastSet(s, sets)) {

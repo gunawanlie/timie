@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'config.dart';
 
-class ConfigData {
+class TaskConfig {
 
   final Color color;
   final String title;
@@ -10,5 +10,5 @@ class ConfigData {
   final int minValue;
   final int maxValue;
 
-  const ConfigData(this.color, this.title, this.config, this.minValue, this.maxValue);
+  const TaskConfig(this.color, this.title, this.config, this.minValue, this.maxValue);
 }

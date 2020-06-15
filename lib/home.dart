@@ -1,11 +1,11 @@
 import 'package:app/task_type.dart';
 import 'package:flutter/material.dart';
 
-import 'configuration.dart';
-import 'config_data.dart';
 import 'config.dart';
+import 'configuration.dart';
 import 'interval_timer.dart';
 import 'pomodoro.dart';
+import 'task_config.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -36,20 +36,20 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Configuration _configuration() {
     switch (_widgetIndex) {
       case 0:
-        List<ConfigData> _configs = [
-          ConfigData(TaskType.task.foregroundColor, 'Focus', Config.pomodoroFocus, 1, 99),
-          ConfigData(TaskType.shortRest.foregroundColor, 'Short Break', Config.pomodoroShortBreak, 1, 99),
-          ConfigData(TaskType.longRest.foregroundColor, 'Long Break', Config.pomodoroLongBreak, 1, 99),
+        List<TaskConfig> _configs = [
+          TaskConfig(TaskType.task.foregroundColor, 'Focus', Config.pomodoroFocus, 1, 99),
+          TaskConfig(TaskType.shortRest.foregroundColor, 'Short Break', Config.pomodoroShortBreak, 1, 99),
+          TaskConfig(TaskType.longRest.foregroundColor, 'Long Break', Config.pomodoroLongBreak, 1, 99),
         ];
         return Configuration(_pomodoro.refreshPomodoro, "Pomodoro", " m", _configs);
         break;
       case 1:
-        List<ConfigData> _configs = [
-          ConfigData(TaskType.task.foregroundColor, 'Exercise', Config.intervalExercise, 1, 99),
-          ConfigData(TaskType.shortRest.foregroundColor, 'Rest', Config.intervalRest, 1, 99),
-          ConfigData(Colors.purple, 'Sets', Config.intervalSets, 1, 12),
-          ConfigData(TaskType.longRest.foregroundColor, 'Recovery', Config.intervalRecovery, 1, 99),
-          ConfigData(Colors.deepOrangeAccent, 'Cycles', Config.intervalCycles, 1, 8),
+        List<TaskConfig> _configs = [
+          TaskConfig(TaskType.task.foregroundColor, 'Exercise', Config.intervalExercise, 1, 99),
+          TaskConfig(TaskType.shortRest.foregroundColor, 'Rest', Config.intervalRest, 1, 99),
+          TaskConfig(Colors.purple, 'Sets', Config.intervalSets, 1, 12),
+          TaskConfig(TaskType.longRest.foregroundColor, 'Recovery', Config.intervalRecovery, 1, 99),
+          TaskConfig(Colors.deepOrangeAccent, 'Cycles', Config.intervalCycles, 1, 8),
         ];
         return Configuration(_intervalTimer.refreshInterval, "Interval", " s", _configs);
         break;

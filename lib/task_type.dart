@@ -1,6 +1,9 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 
 enum TaskType {
+
   task,
   shortRest,
   longRest,
@@ -9,32 +12,18 @@ enum TaskType {
 extension TaskTypeExtensions on TaskType {
 
   Color get backgroundColor {
-    switch (this) {
-      case TaskType.task:
-        return Color(0x66FF0000);
-        break;
-      case TaskType.shortRest:
-        return Color(0x66228B22);
-        break;
-      case TaskType.longRest:
-        return Color(0x660000FF);
-        break;
-    }
-    return null;
+    SplayTreeMap colors = SplayTreeMap<int, Color>();
+    colors[TaskType.task.index] = Color(0x66FF0000);
+    colors[TaskType.shortRest.index] = Color(0x66228B22);
+    colors[TaskType.longRest.index] = Color(0x660000FF);
+    return colors[this.index];
   }
 
   Color get foregroundColor {
-    switch (this) {
-      case TaskType.task:
-        return Color(0xFFFF0000);
-        break;
-      case TaskType.shortRest:
-        return Color(0xFF228B22);
-        break;
-      case TaskType.longRest:
-        return Color(0xFF0000FF);
-        break;
-    }
-    return null;
+    SplayTreeMap colors = SplayTreeMap<int, Color>();
+    colors[TaskType.task.index] = Color(0xFFFF0000);
+    colors[TaskType.shortRest.index] = Color(0xFF228B22);
+    colors[TaskType.longRest.index] = Color(0xFF0000FF);
+    return colors[this.index];
   }
 }
