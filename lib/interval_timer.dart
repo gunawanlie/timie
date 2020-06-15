@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config.dart';
 import 'task.dart';
-import 'tasks.dart';
+import 'task_list.dart';
 import 'task_type.dart';
 
 class IntervalTimer extends StatefulWidget {
@@ -21,7 +21,7 @@ class IntervalTimer extends StatefulWidget {
 class _IntervalTimerState extends State<IntervalTimer> with SingleTickerProviderStateMixin {
 
   AnimationController _animationController;
-  Tasks _interval = Tasks(20, 10, 60, 6, 3);
+  TaskList _interval = TaskList(20, 10, 60, 6, 3);
   String _timerLabel = "";
 
   @override
@@ -52,17 +52,17 @@ class _IntervalTimerState extends State<IntervalTimer> with SingleTickerProvider
     });
   }
 
-  Future<Tasks> getInterval() async {
+  Future<TaskList> getInterval() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     int exercise = sharedPreferences.getInt(Config.intervalExercise.cacheKey) ?? Config.intervalExercise.defaultValue;
     int rest = sharedPreferences.getInt(Config.intervalRest.cacheKey) ?? Config.intervalRest.defaultValue;
     int recovery = sharedPreferences.getInt(Config.intervalRecovery.cacheKey) ?? Config.intervalRecovery.defaultValue;
     int sets = sharedPreferences.getInt(Config.intervalSets.cacheKey) ?? Config.intervalSets.defaultValue;
     int cycles = sharedPreferences.getInt(Config.intervalCycles.cacheKey) ?? Config.intervalCycles.defaultValue;
-    return Tasks(exercise, rest, recovery, sets, cycles);
+    return TaskList(exercise, rest, recovery, sets, cycles);
   }
 
-  void updateInterval(Tasks interval) {
+  void updateInterval(TaskList interval) {
     setState(() {
       _interval = interval;
       _setupTask();

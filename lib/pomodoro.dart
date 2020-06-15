@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config.dart';
 import 'task.dart';
-import 'tasks.dart';
+import 'task_list.dart';
 import 'task_type.dart';
 
 class Pomodoro extends StatefulWidget {
@@ -21,7 +21,7 @@ class Pomodoro extends StatefulWidget {
 class _PomodoroState extends State<Pomodoro> with SingleTickerProviderStateMixin {
 
   AnimationController _animationController;
-  Tasks _pomodoro = Tasks(25, 5, 15, 4, 1);
+  TaskList _pomodoro = TaskList(25, 5, 15, 4, 1);
   String _pomodoroTimeLabel = "";
 
   @override
@@ -49,15 +49,15 @@ class _PomodoroState extends State<Pomodoro> with SingleTickerProviderStateMixin
     });
   }
 
-  Future<Tasks> getPomodoro() async {
+  Future<TaskList> getPomodoro() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     int focus = sharedPreferences.getInt(Config.pomodoroFocus.cacheKey) ?? Config.pomodoroFocus.defaultValue;
     int shortBreak = sharedPreferences.getInt(Config.pomodoroShortBreak.cacheKey) ?? Config.pomodoroShortBreak.defaultValue;
     int longBreak = sharedPreferences.getInt(Config.pomodoroLongBreak.cacheKey) ?? Config.pomodoroLongBreak.defaultValue;
-    return Tasks(focus, shortBreak, longBreak, 4, 1);
+    return TaskList(focus, shortBreak, longBreak, 4, 1);
   }
 
-  void updatePomodoro(Tasks pomodoro) {
+  void updatePomodoro(TaskList pomodoro) {
     setState(() {
       _pomodoro = pomodoro;
       _setupTask();
@@ -182,7 +182,7 @@ class _PomodoroState extends State<Pomodoro> with SingleTickerProviderStateMixin
     );
   }
 
-  List<Widget> _progressIndicators(Tasks pomodoro) {
+  List<Widget> _progressIndicators(TaskList pomodoro) {
     List<Widget> _indicators = [];
 
     for (int i=0; i<pomodoro.count(); i++) {
