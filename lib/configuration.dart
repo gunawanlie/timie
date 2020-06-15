@@ -1,27 +1,30 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:app/config_data.dart';
 
 class Configuration extends StatefulWidget {
-  List<ConfigData> _data = [];
+  String _title;
+  String _timeSymbol;
+  List<ConfigData> _data;
 
-  Configuration() {
-    _data.add(ConfigData(Colors.red, 'Work Out', 'work_out', 1, 99));
-    _data.add(ConfigData(Colors.blue, 'Rest', 'rest', 1, 99));
-    _data.add(ConfigData(Colors.green, 'Long Rest', 'long_rest', 1, 99));
-  }
+  Configuration(this._title, this._timeSymbol, this._data);
 
   @override
   State<StatefulWidget> createState() {
-    return _ConfigurationState(_data);
+    return _ConfigurationState(_title, _timeSymbol, _data);
   }
 }
 
 class _ConfigurationState extends State<Configuration> {
 
+  String _title;
+  String _timeSymbol;
   List<ConfigData> _data;
 
-  _ConfigurationState(this._data);
+  _ConfigurationState(this._title, this._timeSymbol, this._data);
 
   List<Widget> _configurationWidgets() {
     List<Widget> widgets = [];
@@ -55,22 +58,35 @@ class _ConfigurationState extends State<Configuration> {
                   ),
                   elevation: 2,
                   fillColor: Colors.blue,
-                  onPressed: () {},
+                  onPressed: () {
+                    _updateValue(d, -1);
+                  },
                   shape: CircleBorder(),
                 ),
                 height: 30,
                 width: 30,
               ),
-              SizedBox(
-                child: Text(
-                  "88",
-                  style: TextStyle(
-                    fontFamily: 'Teko',
-                    fontSize: 20,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                width: 50,
+              FutureBuilder(
+                future: _cacheValue(d),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return SizedBox(
+                      child: Text(
+                        "${snapshot.data}$_timeSymbol",
+                        style: TextStyle(
+                          fontFamily: 'Teko',
+                          fontSize: 20,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      width: 50,
+                    );
+                  }
+
+                  return SizedBox(
+                    width: 50,
+                  );
+                },
               ),
               SizedBox(
                 child: RawMaterialButton(
@@ -81,7 +97,9 @@ class _ConfigurationState extends State<Configuration> {
                   ),
                   elevation: 2,
                   fillColor: Colors.blue,
-                  onPressed: () {},
+                  onPressed: () {
+                    _updateValue(d, 1);
+                  },
                   shape: CircleBorder(),
                 ),
                 height: 30,
@@ -99,14 +117,29 @@ class _ConfigurationState extends State<Configuration> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Padding(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_title),
+      ),
+      body: Padding(
         child: Column(
           children: _configurationWidgets(),
         ),
         padding: EdgeInsets.symmetric(horizontal: 20.0),
       ),
-      color: Colors.white70,
     );
+  }
+
+  Future<int> _cacheValue(ConfigData config) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getInt(config.cacheKey) ?? config.defaultValue;
+  }
+
+  void _updateValue(ConfigData config, int adjustment) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    int value = sharedPreferences.getInt(config.cacheKey) ?? config.defaultValue;
+    int newValue = min(config.maxValue, max(config.minValue, value + adjustment));
+    await sharedPreferences.setInt(config.cacheKey, newValue);
+    setState(() {});
   }
 }
