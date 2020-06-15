@@ -11,7 +11,9 @@ class Pomodoro extends StatefulWidget {
   _PomodoroState _state = _PomodoroState();
 
   @override
-  State<StatefulWidget> createState() => _state;
+  State<StatefulWidget> createState() {
+    return _state = _PomodoroState();
+  }
 
   refreshPomodoro() {
     _state.getPomodoro().then(_state.updatePomodoro);

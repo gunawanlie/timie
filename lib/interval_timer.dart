@@ -11,7 +11,9 @@ class IntervalTimer extends StatefulWidget {
   _IntervalTimerState _state = _IntervalTimerState();
 
   @override
-  State<StatefulWidget> createState() => _state;
+  State<StatefulWidget> createState() {
+    return _state = _IntervalTimerState();
+  }
 
   refreshInterval() {
     _state.getInterval().then(_state.updateInterval);
