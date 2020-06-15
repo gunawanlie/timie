@@ -1,69 +1,79 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'config.dart';
 import 'task.dart';
 import 'tasks.dart';
 import 'task_type.dart';
 
 class Pomodoro extends StatefulWidget {
+
+  _PomodoroState _state = _PomodoroState();
+
   @override
-  State<StatefulWidget> createState() {
-    return _PomodoroState();
+  State<StatefulWidget> createState() => _state;
+
+  refreshPomodoro() {
+    _state.getPomodoro().then(_state.updatePomodoro);
   }
 }
 
 class _PomodoroState extends State<Pomodoro> with SingleTickerProviderStateMixin {
 
-  Tasks _pomodoro = Tasks(25, 5, 15, 4, 1);
   AnimationController _animationController;
-  String _pomodoroTimeLabel = "23:59";
+  Tasks _pomodoro = Tasks(25, 5, 15, 4, 1);
+  String _pomodoroTimeLabel = "";
 
   @override
   void initState() {
+    _initAnimationController();
+    _setupTask();
+    getPomodoro().then(updatePomodoro);
     super.initState();
-    _setupAnimationController();
-    _updatePomodoroTimerLabel();
   }
 
-  List<Widget> _progressIndicators() {
-    List<Widget> _indicators = [];
-
-    for (int i=0; i<_pomodoro.count(); i++) {
-      double value = (i < _pomodoro.currentTaskIndex() ? 1.0 : (i > _pomodoro.currentTaskIndex() ? 0.0 : _animationController.value));
-
-      _indicators.add(Expanded(
-        child: Container(
-          child: _progressIndicator(_pomodoro.task(i), value),
-          padding: EdgeInsets.symmetric(horizontal: 1.0),
-        ),
-      ));
-    }
-
-    return _indicators;
-  }
-
-  LinearProgressIndicator _progressIndicator(Task task, double value) {
-    return LinearProgressIndicator(
-      backgroundColor: task.type.backgroundColor,
-      value: value,
-      valueColor: AlwaysStoppedAnimation<Color>(task.type.foregroundColor),
-    );
-  }
-
-  void _setupAnimationController() {
+  void _initAnimationController() {
     _animationController = AnimationController(
-      duration: Duration(minutes: _pomodoro.currentTaskDuration()),
+      duration: Duration(minutes: 25),
       vsync: this,
     );
 
     _animationController.reset();
     _animationController.addListener(() {
       if (_animationController.isCompleted) {
-        _refreshAnimatioNController();
+        _setupNextTask();
       }
-      _updatePomodoroTimerLabel();
-      setState(() {});
+      setState(() {
+        _updatePomodoroTimerLabel();
+      });
     });
+  }
+
+  Future<Tasks> getPomodoro() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    int focus = sharedPreferences.getInt(Config.pomodoroFocus.cacheKey) ?? Config.pomodoroFocus.defaultValue;
+    int shortBreak = sharedPreferences.getInt(Config.pomodoroShortBreak.cacheKey) ?? Config.pomodoroShortBreak.defaultValue;
+    int longBreak = sharedPreferences.getInt(Config.pomodoroLongBreak.cacheKey) ?? Config.pomodoroLongBreak.defaultValue;
+    return Tasks(focus, shortBreak, longBreak, 4, 1);
+  }
+
+  void updatePomodoro(Tasks pomodoro) {
+    setState(() {
+      _pomodoro = pomodoro;
+      _setupTask();
+    });
+  }
+
+  void _setupNextTask() {
+    _animationController.stop();
+    _pomodoro.next();
+    _setupTask();
+  }
+
+  void _setupTask() {
+    _animationController.duration = Duration(minutes: _pomodoro.currentTaskDuration());
+    _animationController.value = _animationController.lowerBound;
+    _updatePomodoroTimerLabel();
   }
 
   void _updatePomodoroTimerLabel() {
@@ -73,13 +83,6 @@ class _PomodoroState extends State<Pomodoro> with SingleTickerProviderStateMixin
     int minutes = (left / 60).floor();
     int seconds = left % 60;
     _pomodoroTimeLabel = "${minutes}:${seconds.toString().padLeft(2, '0')}";
-  }
-
-  void _refreshAnimatioNController() {
-    _animationController.stop();
-    _pomodoro.next();
-    _animationController.duration = Duration(minutes: _pomodoro.currentTaskDuration());
-    _animationController.value = _animationController.lowerBound;
   }
 
   @override
@@ -105,7 +108,7 @@ class _PomodoroState extends State<Pomodoro> with SingleTickerProviderStateMixin
                   ),
                 ),
                 Row(
-                  children: _progressIndicators(),
+                  children: _progressIndicators(_pomodoro),
                   mainAxisAlignment: MainAxisAlignment.center,
                 ),
                 Row(
@@ -121,8 +124,9 @@ class _PomodoroState extends State<Pomodoro> with SingleTickerProviderStateMixin
                           ),
                           color: Colors.blue,
                           onPressed: () {
-                            _animationController.forward();
-                            setState(() {});
+                            setState(() {
+                              _animationController.forward();
+                            });
                           },
                         ),
                         padding: EdgeInsets.symmetric(horizontal: 5.0),
@@ -140,8 +144,9 @@ class _PomodoroState extends State<Pomodoro> with SingleTickerProviderStateMixin
                           ),
                           color: Colors.blue,
                           onPressed: () {
-                            _animationController.stop();
-                            setState(() {});
+                            setState(() {
+                              _animationController.stop();
+                            });
                           },
                         ),
                         padding: EdgeInsets.symmetric(horizontal: 5.0),
@@ -158,8 +163,9 @@ class _PomodoroState extends State<Pomodoro> with SingleTickerProviderStateMixin
                         ),
                         color: Colors.blue,
                         onPressed: () {
-                          _refreshAnimatioNController();
-                          setState(() {});
+                          setState(() {
+                            _setupNextTask();
+                          });
                         },
                       ),
                       padding: EdgeInsets.symmetric(horizontal: 5.0),
@@ -173,6 +179,31 @@ class _PomodoroState extends State<Pomodoro> with SingleTickerProviderStateMixin
         ],
         mainAxisAlignment: MainAxisAlignment.center,
       )
+    );
+  }
+
+  List<Widget> _progressIndicators(Tasks pomodoro) {
+    List<Widget> _indicators = [];
+
+    for (int i=0; i<pomodoro.count(); i++) {
+      double value = (i < pomodoro.currentTaskIndex() ? 1.0 : (i > pomodoro.currentTaskIndex() ? 0.0 : _animationController.value));
+
+      _indicators.add(Expanded(
+        child: Container(
+          child: _progressIndicator(pomodoro.task(i), value),
+          padding: EdgeInsets.symmetric(horizontal: 1.0),
+        ),
+      ));
+    }
+
+    return _indicators;
+  }
+
+  LinearProgressIndicator _progressIndicator(Task task, double value) {
+    return LinearProgressIndicator(
+      backgroundColor: task.type.backgroundColor,
+      value: value,
+      valueColor: AlwaysStoppedAnimation<Color>(task.type.foregroundColor),
     );
   }
 }

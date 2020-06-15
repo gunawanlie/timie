@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'configuration.dart';
 import 'config_data.dart';
+import 'config.dart';
 import 'interval_timer.dart';
 import 'pomodoro.dart';
 
@@ -18,10 +19,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   PageController _pageController = PageController();
 
   int _widgetIndex = 0;
-  final List<Widget> _widgets = [
-    Pomodoro(),
-    IntervalTimer(),
-  ];
+  Pomodoro _pomodoro = Pomodoro();
+  IntervalTimer _intervalTimer = IntervalTimer();
 
   final List<BottomNavigationBarItem> _navigationBarItems = [
     BottomNavigationBarItem(
@@ -38,21 +37,21 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     switch (_widgetIndex) {
       case 0:
         List<ConfigData> _configs = [
-          ConfigData(TaskType.task.foregroundColor, 'Focus', 'pomodoro_focus', 25, 1, 99),
-          ConfigData(TaskType.shortRest.foregroundColor, 'Short Break', 'pomodoro_short_break', 5, 1, 99),
-          ConfigData(TaskType.longRest.foregroundColor, 'Long Break', 'pomodoro_long_break', 15, 1, 99),
+          ConfigData(TaskType.task.foregroundColor, 'Focus', Config.pomodoroFocus, 1, 99),
+          ConfigData(TaskType.shortRest.foregroundColor, 'Short Break', Config.pomodoroShortBreak, 1, 99),
+          ConfigData(TaskType.longRest.foregroundColor, 'Long Break', Config.pomodoroLongBreak, 1, 99),
         ];
-        return Configuration("Pomodoro", " m", _configs);
+        return Configuration(_pomodoro.refreshPomodoro, "Pomodoro", " m", _configs);
         break;
       case 1:
         List<ConfigData> _configs = [
-          ConfigData(TaskType.task.foregroundColor, 'Exercise', 'interval_exercise', 20, 1, 99),
-          ConfigData(TaskType.shortRest.foregroundColor, 'Rest', 'interval_rest', 10, 1, 99),
-          ConfigData(Colors.purple, 'Sets', 'interval_sets', 8, 1, 12),
-          ConfigData(TaskType.longRest.foregroundColor, 'Recovery', 'interval_recovery', 60, 1, 99),
-          ConfigData(Colors.deepOrangeAccent, 'Cycles', 'interval_cycles', 3, 1, 8),
+          ConfigData(TaskType.task.foregroundColor, 'Exercise', Config.intervalExercise, 1, 99),
+          ConfigData(TaskType.shortRest.foregroundColor, 'Rest', Config.intervalRest, 1, 99),
+          ConfigData(Colors.purple, 'Sets', Config.intervalSets, 1, 12),
+          ConfigData(TaskType.longRest.foregroundColor, 'Recovery', Config.intervalRecovery, 1, 99),
+          ConfigData(Colors.deepOrangeAccent, 'Cycles', Config.intervalCycles, 1, 8),
         ];
-        return Configuration("Interval", " s", _configs);
+        return Configuration(_intervalTimer.refreshInterval, "Interval", " s", _configs);
         break;
     }
     return null;
@@ -85,7 +84,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             this._widgetIndex = index;
           });
         },
-        children: _widgets,
+        children: [
+          _pomodoro,
+          _intervalTimer,
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _widgetIndex,

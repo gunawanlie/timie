@@ -1,30 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'config.dart';
 import 'task.dart';
 import 'tasks.dart';
 import 'task_type.dart';
 
 class IntervalTimer extends StatefulWidget {
+
+  _IntervalTimerState _state = _IntervalTimerState();
+
   @override
-  State<StatefulWidget> createState() {
-    return _IntervalTimerState();
+  State<StatefulWidget> createState() => _state;
+
+  refreshInterval() {
+    _state.getInterval().then(_state.updateInterval);
   }
 }
 
 class _IntervalTimerState extends State<IntervalTimer> with SingleTickerProviderStateMixin {
 
-  Tasks _interval = Tasks(30, 10, 30, 6, 4);
   AnimationController _animationController;
-  String _timerLabel = "88";
+  Tasks _interval = Tasks(20, 10, 60, 6, 3);
+  String _timerLabel = "";
 
   @override
   void initState() {
+    _initAnimationController();
+    _setupTask();
+    getInterval().then(updateInterval);
     super.initState();
-    _setupAnimationController();
-    _updateTimerLabel();
   }
 
-  void _setupAnimationController() {
+  void _initAnimationController() {
     _animationController = AnimationController(
       duration: Duration(seconds: _interval.currentTaskDuration()),
       vsync: this,
@@ -33,14 +41,44 @@ class _IntervalTimerState extends State<IntervalTimer> with SingleTickerProvider
     _animationController.reset();
     _animationController.addListener(() {
       if (_animationController.isCompleted) {
-        _refreshAnimatioNController();
+        _setupNextTask();
         if (_interval.currentTaskIndex() != 0) {
           _animationController.forward();
         }
       }
-      _updateTimerLabel();
-      setState(() {});
+      setState(() {
+        _updateTimerLabel();
+      });
     });
+  }
+
+  Future<Tasks> getInterval() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    int exercise = sharedPreferences.getInt(Config.intervalExercise.cacheKey) ?? Config.intervalExercise.defaultValue;
+    int rest = sharedPreferences.getInt(Config.intervalRest.cacheKey) ?? Config.intervalRest.defaultValue;
+    int recovery = sharedPreferences.getInt(Config.intervalRecovery.cacheKey) ?? Config.intervalRecovery.defaultValue;
+    int sets = sharedPreferences.getInt(Config.intervalSets.cacheKey) ?? Config.intervalSets.defaultValue;
+    int cycles = sharedPreferences.getInt(Config.intervalCycles.cacheKey) ?? Config.intervalCycles.defaultValue;
+    return Tasks(exercise, rest, recovery, sets, cycles);
+  }
+
+  void updateInterval(Tasks interval) {
+    setState(() {
+      _interval = interval;
+      _setupTask();
+    });
+  }
+
+  void _setupNextTask() {
+    _animationController.stop();
+    _interval.next();
+    _setupTask();
+  }
+
+  void _setupTask() {
+    _animationController.duration = Duration(seconds: _interval.currentTaskDuration());
+    _animationController.value = _animationController.lowerBound;
+    _updateTimerLabel();
   }
 
   void _updateTimerLabel() {
@@ -48,13 +86,6 @@ class _IntervalTimerState extends State<IntervalTimer> with SingleTickerProvider
     double progress = _animationController.upperBound - _animationController.value;
     int left = (progress * duration + 0.20).floor();
     _timerLabel = "$left";
-  }
-
-  void _refreshAnimatioNController() {
-    _animationController.stop();
-    _interval.next();
-    _animationController.duration = Duration(seconds: _interval.currentTaskDuration());
-    _animationController.value = _animationController.lowerBound;
   }
 
   @override
@@ -149,8 +180,9 @@ class _IntervalTimerState extends State<IntervalTimer> with SingleTickerProvider
                       ),
                       color: Colors.blue,
                       onPressed: () {
-                      _animationController.forward();
-                        setState(() {});
+                        setState(() {
+                          _animationController.forward();
+                        });
                       },
                     ),
                     padding: EdgeInsets.symmetric(horizontal: 5.0),
@@ -168,8 +200,9 @@ class _IntervalTimerState extends State<IntervalTimer> with SingleTickerProvider
                       ),
                       color: Colors.blue,
                       onPressed: () {
-                        _animationController.stop();
-                        setState(() {});
+                        setState(() {
+                          _animationController.stop();
+                        });
                       },
                     ),
                     padding: EdgeInsets.symmetric(horizontal: 5.0),
@@ -186,11 +219,12 @@ class _IntervalTimerState extends State<IntervalTimer> with SingleTickerProvider
                     ),
                     color: Colors.blue,
                     onPressed: () {
-                      _refreshAnimatioNController();
-                      if (_interval.currentTaskIndex() != 0) {
-                        _animationController.forward();
-                      }
-                      setState(() {});
+                      setState(() {
+                        _setupNextTask();
+                        if (_interval.currentTaskIndex() != 0) {
+                          _animationController.forward();
+                        }
+                      });
                     },
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 5.0),
